@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>物品保质期管理工具</title>
+</head>
+<body>
+<!--顶部栏-->
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0" th:fragment="topbar" id="ff">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="/index" th:text="牧童科技"></a>
+    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"
+           list="words"
+           id="searchIn">
+
+    <datalist id="words">
+    </datalist>
+
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="">退出登录</a>
+        </li>
+    </ul>
+</nav>
+
+
+<!--侧边栏-->
+<nav class="col-md-2 d-none d-md-block bg-light sidebar" th:fragment="sidebar">
+    <div class="sidebar-sticky">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a th:class="${active == 'main.html'? 'nav-link active' : 'nav-link'}" href="/index">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-home">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    添加物品<span class="sr-only">(current)</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:class="${active=='unexpired.html'? 'nav-link active' : 'nav-link'}" href="/list/false">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    未过期物品
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:class="${active=='expired.html'? 'nav-link active' : 'nav-link'}" href="/list/true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-users">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    已过期物品
+                </a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+<!--换页列表-->
+<div class="container-fluid" th:fragment="page">
+    <br>
+    <br>
+    <br>
+    <br>
+    <div th:text="${errorMsg}" style="color: red"></div>
+    <div class="row">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <!--                    <li class="page-item"><a class="page-link" th:href="@{/{to}(to=${to},f='top')}">首页</a></li>-->
+                    <li class="page-item"><a class="page-link" th:href="@{{url}(url=${#request.servletPath},f='top')}">首页</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" th:href="@{{url}(url=${#request.servletPath},f='pre')}">上一页</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" th:href="@{{url}(url=${#request.servletPath},f='nxt')}">下一页</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" th:href="@{{url}(url=${#request.servletPath},f='tail')}">尾页</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+</div>
+
+<!--物品表格-->
+<div th:fragment="goodsTable">
+    <table class="table table-borderless">
+        <thead class="thead-dark row-fluid">
+        <tr>
+            <th>编号</th>
+            <th colspan="2">信息</th>
+            <th>图片</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody th:each="goods,status:${goodsList}">
+
+        <tr>
+            <td rowspan="4" th:text="${status.count}"></td>
+
+            <td class="table-active">物品名</td>
+
+            <td th:text="${goods.getProductName()}"></td>
+
+            <td rowspan="4" style="width: 260px">
+                    <a th:href="@{{url}(url=${goods.getProductImg()})}">
+                        <img th:src="@{{url}(url=${goods.getProductImg()})}" class="img-fluid img-thumbnail">
+                    </a>
+            </td>
+
+            <td rowspan="2">
+                <a th:href="@{{parent}/delete/(parent=${#request.servletPath},id=${goods.getId()})}"
+                   th:id="link+${status.count}" hidden></a>
+                <button class="btn btn-danger btn-sm" th:onclick="'javascript:delete_(link'+${status.count}+')'">删除
+                </button>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table-active">生产日期</td>
+            <td th:text="${#dates.format(goods.getProductionDate(),'yyyy-MM-dd')}"></td>
+        </tr>
+
+        <tr>
+            <td class="table-active">保质期（天）</td>
+            <td th:text="${goods.getExpirationDate()}"></td>
+            <td colspan="2">
+                <a th:href="@{{parent}/toUpdate/(parent=${#request.servletPath},id=${goods.getId()})}"
+                   class="btn btn-primary btn-sm">修改</a>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="table-active">距过期时间（天）</td>
+            <td th:text="${goods.getRemainDays()}"></td>
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>

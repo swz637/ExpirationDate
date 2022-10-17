@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.swz637.Dao.GoodsMapper">
+    <cache/>
+    <insert id="addGoods" parameterType="Goods">
+        insert into sb_emp.goods
+        values (null, #{productName}, #{productionDate}, #{expirationDate}, #{productImg})
+    </insert>
+
+
+    <select id="selectGoodsLimit" resultType="Goods">
+        select (gs.expirationDate - datediff(now(), productionDate)) remainDays,
+        productName, productionDate,id,productImg,expirationDate
+        from sb_emp.goods gs
+        <if test="isExpired">
+            where datediff(now(), productionDate) >= expirationDate
+        </if>
+        <if test="!isExpired">
+            where expirationDate > datediff(now(), productionDate)
+        </if>
+        order by remainDays
+        limit #{start},#{limit}
+    </select>
+
+    <select id="countGoods" resultType="int">
+        select count(*)
+        from sb_emp.goods gs
+        <if test="isExpired">
+            where datediff(now(), productionDate) >= expirationDate
+        </if>
+        <if test="!isExpired">
+            where expirationDate > datediff(now(), productionDate)
+        </if>
+
+    </select>
+
+    <delete id="deleteById">
+        delete
+        from sb_emp.goods
+        where id = #{id}
+    </delete>
+
+    <select id="selectById" resultType="Goods">
+        select *
+        from sb_emp.goods
+        where id = #{id};
+    </select>
+
+    <update id="update" parameterType="Goods">
+        update sb_emp.goods
+        set productName    = #{productName},
+            productionDate = #{productionDate},
+            expirationDate = #{expirationDate}
+        where id = #{id}
+    </update>
+</mapper>

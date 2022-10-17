@@ -1,0 +1,39 @@
+spring:
+  thymeleaf:
+    cache: false
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    username: root
+    password: 6376
+    url: jdbc:mysql://localhost:3306/sb_emp
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    filters: mergeStat,wall,log4j,config
+    stat-view-servlet:
+      login-username: 李诗情
+      login-password: 1376
+      allow: 127.0.0.1,192.168.0.155
+    web-stat-filter:
+      url-pattern: /*
+      exclusions: /*.js,*.gif,*.jpg,*.svg,*.css,/druid/*
+    use-global-data-source-stat: true
+    max-pool-prepared-statement-per-connection-size: 20
+    connection-properties: druid.stat.mergeSql=true,druid.stat.slowSqlMillis=500
+
+
+  mvc:
+    format:
+      date: yyyy-MM-dd
+
+
+mybatis:
+  type-aliases-package: com.swz637.Bean
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+
+
